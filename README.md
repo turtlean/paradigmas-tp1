@@ -7,3 +7,4 @@ Opciones:
 - Objetos funcionales
 - Dos para los cien abrazos (O su versión en inglés: "Two to one hundred hugs")
 - Borom bom bom, Borom bom bom. Para Fidel, la selección
+- Lazy no es un defecto, es un feature.
