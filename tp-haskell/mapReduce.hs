@@ -16,7 +16,7 @@ belongs = \k dict -> not ( null (filter (\e -> fst e == k) dict) )
 
 (?) :: Eq k => Dict k v -> k -> Bool
 --(?) = undefined
-(?) = belongs
+(?) = flip belongs 
 --Main> [("calle",[3]),("city",[2,1])] ? "city" 
 --True
 
