@@ -1,7 +1,0 @@
-Tenemos que elegir nombre para el grupo !!
-
-Opciones:
-- Java, decime qué se siente
-- Intervalo por favor
-- Con 15 funciones me hago alto paradigma
-
