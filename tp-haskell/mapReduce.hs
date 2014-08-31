@@ -22,10 +22,11 @@ belongs = \k dict -> not ( null (filter (\e -> fst e == k) dict) )
 
 -- Ejercicio 2
 get :: Eq k => k -> Dict k v -> v
-get = undefined
+--get = undefined
+get = \k dict -> snd ((filter (\(x,y) -> x==k) dict) !! 0)
 
 (!) :: Eq k => Dict k v -> k -> v
-(!) = undefined
+(!) = flip get
 --Main> [("calle",[3]),("city",[2,1])] ! "city" 
 --[2,1]
 
