@@ -8,7 +8,11 @@ type Dict k v = [(k,v)]
 
 -- Ejercicio 1
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs = undefined
+--belongs = undefined
+--belongs = \x dict -> not (null ( filter (==k) (map fst dict) ))
+--belongs = \x dict -> not (null [e | e <- dict, (fst e) == k ])
+--belongs = \k dict -> foldr (\e rec -> (fst e) ==k || rec) False dict
+belongs = \k dict -> not ( null (filter (\e -> fst e == k) dict) )
 
 (?) :: Eq k => Dict k v -> k -> Bool
 (?) = undefined
