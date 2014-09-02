@@ -46,11 +46,12 @@ insert_2 k v dict = dict ++ [(k,v)]
 
 -- Ejercicio 4
 groupByKey :: Eq k => [(k,v)] -> Dict k [v]
-groupByKey = undefined
+groupByKey = \l -> foldl (\rec (k,v)-> insertWith (++) k [v] rec) [] l
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith = undefined
+unionWith = \f d1 d2 -> foldl (\rec (k, v) -> insertWith f k v rec) [] (d1 ++ d2) 
+
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
 
