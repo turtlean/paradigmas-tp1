@@ -33,11 +33,14 @@ get = \k dict -> snd ((filter (\(x,y) -> x==k) dict) !! 0)
 -- Ejercicio 3
 -- REVISAR! Solo es la primera idea (no fue probada)
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
-insertWith = \f k v dict -> if dict ? k then update f k v dict
-										else insert k v dict
-							where update f k v dict = foldr (\e rec -> if fst e == k then (k, (f (snd e) v )) : rec else e:rec ) [] dict ,
-							insert k v dict = (k,v) :  dict
-							
+insertWith = \f k v dict -> if dict ? k then update_2 f k v dict else insert_2 k v dict
+										
+update_2 :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
+update_2 f k v dict = foldr (\e rec -> if fst e == k then (k, (f (snd e) v )) : rec else e:rec ) [] dict 
+
+insert_2 :: Eq k => k -> v -> Dict k v -> Dict k v
+insert_2 k v dict = dict ++ [(k,v)] 
+
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
 --[(1,"lab"),(2,"p")]
 
