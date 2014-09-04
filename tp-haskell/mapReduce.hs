@@ -63,7 +63,15 @@ type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
 distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess = undefined
+distributionProcess n l = foldl_more_arguments (\rec e n_fijo n_variable -> insert_at_position (mod n_variable n_fijo) e rec) n 0 (replicate n []) l 
+
+foldl_more_arguments :: ( b -> a -> Int -> Int -> b) -> Int -> Int -> b -> [a] -> b
+foldl_more_arguments f_combinadora _ _ rec [] = rec
+foldl_more_arguments f_combinadora n_fijo n_variable rec (x:xs) = foldl_more_arguments f_combinadora n_fijo (n_variable+1) (f_combinadora rec x n_fijo n_variable) xs
+
+-- Like take
+insert_at_position:: Int -> a -> [[a]] -> [[a]]
+insert_at_position = fold
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
