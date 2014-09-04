@@ -73,6 +73,26 @@ foldl_more_arguments f_combinadora n_fijo n_variable rec (x:xs) = foldl_more_arg
 insert_at_position:: Int -> a -> [[a]] -> [[a]]
 insert_at_position = fold
 
+---- OTRA ALTERNATIVA ---------------
+--distributionProcess :: (Eq a) => Int -> [a] -> [[a]]
+--distributionProcess n l = foldl (\rec e -> insertLast (indiceMenorLongitud rec) e rec ) (replicate n []) l
+--
+--insertLast:: Int -> a -> [[a]] -> [[a]]
+--insertLast _ _ [] = []
+--insertLast 0 e (x:xs) = (x++[e]) :xs
+--insertLast n e (x:xs) = x: (insertLast (n-1) e xs)
+--
+--indiceMenorLongitud:: (Eq a) => [[a]] -> Int
+--indiceMenorLongitud ls = primeraAparicion (minimumList ls) ls
+--
+--minimumList:: [[a]] -> [a]
+--minimumList l = foldr1 (\rec e -> if length e < length rec then e else rec) l
+--
+--primeraAparicion:: (Eq a) => a -> [a] -> Int
+--primeraAparicion x (l) = foldr (\e rec -> if e==x then 0 else 1+rec) 0 l
+
+------------------------------------
+
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
 mapperProcess = undefined
