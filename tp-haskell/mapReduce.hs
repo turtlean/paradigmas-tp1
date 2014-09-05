@@ -63,7 +63,7 @@ type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
 
-distributionProcess :: (Eq a) => Int -> [a] -> [[a]]
+distributionProcess :: Int -> [a] -> [[a]]
 distributionProcess n l = foldl (\rec e -> (tail rec) ++ [(head rec) ++ [e]] ) (replicate n []) l
 
 ------------------------------------
