@@ -62,34 +62,9 @@ type Mapper a k v = a -> [(k,v)]
 type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
-distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess n l = foldl_more_arguments (\rec e n_fijo n_variable -> insert_at_position (mod n_variable n_fijo) e rec) n 0 (replicate n []) l 
 
-foldl_more_arguments :: ( b -> a -> Int -> Int -> b) -> Int -> Int -> b -> [a] -> b
-foldl_more_arguments f_combinadora _ _ rec [] = rec
-foldl_more_arguments f_combinadora n_fijo n_variable rec (x:xs) = foldl_more_arguments f_combinadora n_fijo (n_variable+1) (f_combinadora rec x n_fijo n_variable) xs
-
--- Like take
-insert_at_position:: Int -> a -> [[a]] -> [[a]]
-insert_at_position = fold
-
----- OTRA ALTERNATIVA ---------------
---distributionProcess :: (Eq a) => Int -> [a] -> [[a]]
---distributionProcess n l = foldl (\rec e -> insertLast (indiceMenorLongitud rec) e rec ) (replicate n []) l
---
---insertLast:: Int -> a -> [[a]] -> [[a]]
---insertLast _ _ [] = []
---insertLast 0 e (x:xs) = (x++[e]) :xs
---insertLast n e (x:xs) = x: (insertLast (n-1) e xs)
---
---indiceMenorLongitud:: (Eq a) => [[a]] -> Int
---indiceMenorLongitud ls = primeraAparicion (minimumList ls) ls
---
---minimumList:: [[a]] -> [a]
---minimumList l = foldr1 (\rec e -> if length e < length rec then e else rec) l
---
---primeraAparicion:: (Eq a) => a -> [a] -> Int
---primeraAparicion x (l) = foldr (\e rec -> if e==x then 0 else 1+rec) 0 l
+distributionProcess :: (Eq a) => Int -> [a] -> [[a]]
+distributionProcess n l = foldl (\rec e -> (tail rec) ++ [(head rec) ++ [e]] ) (replicate n []) l
 
 ------------------------------------
 
