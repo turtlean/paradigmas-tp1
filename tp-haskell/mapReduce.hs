@@ -74,7 +74,10 @@ mapperProcess f l = groupByKey ( concat (map f l) )
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
-combinerProcess ls = foldl (\rec e -> insertWith (++) (fst e) (snd e) rec ) [] (concat ls)
+combinerProcess ls = map (\(k, l) -> (k, concat l)) (sortByKey (groupByKey ( concat ls )))
+
+sortByKey::(Eq k, Ord k) => [(k, [v])] -> [(k,[v])]
+sortByKey = sortBy ( (\e1 e2 -> compare (fst e1) (fst e2) ) )
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
