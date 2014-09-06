@@ -70,11 +70,11 @@ distributionProcess n l = foldl (\rec e -> (tail rec) ++ [(head rec) ++ [e]] ) (
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
-mapperProcess = undefined
+mapperProcess f l = groupByKey ( concat (map f l) )
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
-combinerProcess = undefined
+combinerProcess ls = foldl (\rec e -> insertWith (++) (fst e) (snd e) rec ) [] (concat ls)
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
