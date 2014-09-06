@@ -8,12 +8,49 @@ import MapReduce
 
 main :: IO ()
 main = hspec $ do
+
   describe "Utilizando Diccionarios" $ do
     it "puede determinarse si un elemento es una clave o no" $ do
       belongs 3 [(3, "A"), (0, "R"), (7, "G")]    `shouldBe` True
       belongs "k" []                              `shouldBe` False
       [("H", [1]), ("E", [2]), ("Y", [0])] ? "R"  `shouldBe` False
       [("V", [1]), ("O", [2]), ("S", [0])] ? "V"  `shouldBe` True
+
+    it "puede obtenerse el valor de una clave si la misma está definida" $ do
+      get 4 [(4,"Tiempo"),(5,"Dinero")] `shouldBe` "Tiempo"
+      [(1,"Femur"),(2,"Húmero"),(3,"Cúbito")] ! 2 `shouldBe` "Húmero"	       
+
+    --- insertWith --- 
+
+    it "puede insertarse un elemento (clave,valor) en el diccionario si la clave no está definida" $ do
+      insertWith (+) "valor" 3 [("eficiencia",2)] `shouldBe` [("eficiencia",2),("valor",3)]
+      insertWith (++) "valor" [3] [("eficiencia",[2])] `shouldBe` [("eficiencia",[2]),("valor",[3])]
+      insertWith (++) "valor" [3] [] `shouldBe` [("valor",[3])]
+
+    it "puede insertarse un elemento (clave,valor) en el diccionario cuando la clave ya está definida" $ do
+      insertWith (+) "valor" 3 [("valor",5),("eficiencia",3)] `shouldBe` [("valor",8),("eficiencia",3)]
+      insertWith (++) "valor" [3] [("eficiencia",[2]), ("valor",[1])] `shouldBe` [("eficiencia",[2]),("valor",[1,3])]
+
+   --- groupByKey
+
+    it "puede agruparse correctamente por clave" $ do
+      groupByKey [] `shouldBe` ([]::Dict Int [Char])
+      groupByKey [(1,"one"),(2,"two"),(1,"uno"),(2,"dos")] `shouldBe` [(1,["one","uno"]),(2,["two","dos"])]
+
+   --- unionWith
+
+    it "pueden mergearse correctamente 2 diccionarios" $ do
+      unionWith (++) [] [] `shouldBe` ([]::Dict Int [[Char]])
+      unionWith (++) [(1,["poemas"]),(2,["fútbol"])] [(1,["ensayos"])] `shouldBe` [(1,["poemas","ensayos"]),(2,["fútbol"])]  
+
+  describe "Mapper & Reducer" $ do
+      --- distrbutionProcess               
+      it "la carga es distribuída de forma balanceada" $ do
+	distributionProcess 5 [1..10] `shouldBe` [[1,6],[2,7],[3,8],[4,9],[5,10]]
+       
+      --- mapperProcess 
+      -- it "aplica correctamente la función de mapeo y luego agrupa por clave" & do
+
 
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
