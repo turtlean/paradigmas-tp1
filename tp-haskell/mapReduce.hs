@@ -81,11 +81,11 @@ sortByKey = sortBy ( (\e1 e2 -> compare (fst e1) (fst e2) ) )
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
-reducerProcess = undefined
+reducerProcess f l = concat ( map f l)
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
-mapReduce = undefined
+mapReduce mapper reducer l =  reducerProcess reducer (combinerProcess (map (mapperProcess mapper) (distributionProcess 100 l) ) )
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
