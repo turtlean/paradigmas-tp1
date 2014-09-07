@@ -8,21 +8,15 @@ type Dict k v = [(k,v)]
 
 -- Ejercicio 1
 belongs :: Eq k => k -> Dict k v -> Bool
---belongs = undefined
---belongs = \x dict -> not (null ( filter (==k) (map fst dict) ))
---belongs = \x dict -> not (null [e | e <- dict, (fst e) == k ])
---belongs = \k dict -> foldr (\e rec -> (fst e) ==k || rec) False dict
 belongs = \k dict -> not ( null (filter (\e -> fst e == k) dict) )
 
 (?) :: Eq k => Dict k v -> k -> Bool
---(?) = undefined
 (?) = flip belongs 
 --Main> [("calle",[3]),("city",[2,1])] ? "city" 
 --True
 
 -- Ejercicio 2
 get :: Eq k => k -> Dict k v -> v
---get = undefined
 get = \k dict -> snd ((filter (\(x,y) -> x==k) dict) !! 0)
 
 (!) :: Eq k => Dict k v -> k -> v
@@ -31,15 +25,14 @@ get = \k dict -> snd ((filter (\(x,y) -> x==k) dict) !! 0)
 --[2,1]
 
 -- Ejercicio 3
--- REVISAR! Solo es la primera idea (no fue probada)
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
-insertWith = \f k v dict -> if dict ? k then update_2 f k v dict else insert_2 k v dict
+insertWith = \f k v dict -> if dict ? k then updateDict f k v dict else insertInDict k v dict
 										
-update_2 :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
-update_2 f k v dict = foldr (\e rec -> if fst e == k then (k, (f (snd e) v )) : rec else e:rec ) [] dict 
+updateDict :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
+updateDict f k v dict = foldr (\e rec -> if fst e == k then (k, (f (snd e) v )) : rec else e:rec ) [] dict 
 
-insert_2 :: Eq k => k -> v -> Dict k v -> Dict k v
-insert_2 k v dict = dict ++ [(k,v)] 
+insertInDict :: Eq k => k -> v -> Dict k v -> Dict k v
+insertInDict k v dict = dict ++ [(k,v)] 
 
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
 --[(1,"lab"),(2,"p")]
@@ -89,14 +82,14 @@ mapReduce mapper reducer l =  reducerProcess reducer (combinerProcess (map (mapp
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
-visitasPorMonumento l = mapReduce (\s -> [(s,1)] ) (\e -> [( (fst e), (sum (snd e)) )]) l
+visitasPorMonumento l = mapReduce (\s -> [(s,1)] ) (\(k,v) -> [( k, length(v) )]) l
 
 -- Otra opcion:
 visitasPorMonumento l = mapReduce mapper reducer l
 	where mapper = \e -> [(e, 1)]
-		reducer = \(k, l) -> [(k, (lenght l))]
+	      reducer = \(k, l) -> [(k, (length l))]
 
-let visitasPorMonumento l = mapReduce (\e -> [(e, 1)]) (\(k, l) -> [(k, (lenght l))]) l
+-- let visitasPorMonumento l = mapReduce (\e -> [(e, 1)]) (\(k, l) -> [(k, (lenght l))]) l
 
 -- Ejercicio 12
 -- Idea-ejemplo:
@@ -105,22 +98,34 @@ let visitasPorMonumento l = mapReduce (\e -> [(e, 1)]) (\(k, l) -> [(k, (lenght 
 --			mapper->[(-1, "m1"), (-2, "m2")] 
 --				orderByKey --> [(-2, "m2"), (-1, "m1")] 
 --					reducecer -> ["m2", "m1"]
-monumentosTop :: [String] -> [String]
+
+monumentosTop:: [String] -> [String]
 monumentosTop = \l -> mapReduce mapper reducer ( visitasPorMonumento l ) 
 	where mapper = \(k, v) -> [(-v, k)]
-		reducer = \(k, l) -> l
+	      reducer = \(k, l) -> l
+
+-- monumentosTop = \l -> mapReduce (\(k,v) -> [(-v,k)]) (\(k,l) ->l) (visitasPorMonumento l)
   
 
 -- Ejercicio 13 
 -- No probado (error en el s==Monument, trate con pattern matching, pero es medio bardero el GHCI
 -- Hay que usar pattern matchin, o definir la igualdad para Structure?
+
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
-monumentosPorPais =  \l -> mapReduce mapper reducer items
-	where mapper = \(s, dict) -> if s == Monument then [(dict!"country", 1)] else []
-		reducer = \(pais, l) -> [(pais, (length l)] 
+-- monumentosPorPais =  \l -> mapReduce mapper reducer items
+	-- where mapper = \(s, dict) -> if s == Monument then [(dict!"country", 1)] else []
+		-- reducer = \(pais, l) -> [(pais, (length l)] 
+
+monumentosPorPais l = mapReduce (\(s,dict) -> if (isMonument s) then [((dict ! "country"),1)] else [] ) ( \(pais,l) -> [(pais, (length l))] ) l
+
 
 -- ------------------------ Ejemplo de datos del ejercicio 13 ----------------------
 data Structure = Street | City | Monument deriving Show
+
+isMonument:: Structure -> Bool
+isMonument Street = False
+isMonument City = False
+isMonument Monument = True
 
 items :: [(Structure, Dict String String)]
 items = [
