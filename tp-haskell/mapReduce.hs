@@ -89,7 +89,7 @@ mapReduce mapper reducer l =  reducerProcess reducer (combinerProcess (map (mapp
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
-visitasPorMonumento = undefined
+visitasPorMonumento l = mapReduce (\s -> [(s,1)] ) (\e -> [( (fst e), (sum (snd e)) )]) l
 
 -- Ejercicio 12
 monumentosTop :: [String] -> [String]
