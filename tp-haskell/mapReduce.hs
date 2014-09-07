@@ -96,15 +96,28 @@ visitasPorMonumento l = mapReduce mapper reducer l
 	where mapper = \e -> [(e, 1)]
 		reducer = \(k, l) -> [(k, (lenght l))]
 
+let visitasPorMonumento l = mapReduce (\e -> [(e, 1)]) (\(k, l) -> [(k, (lenght l))]) l
 
 -- Ejercicio 12
+-- Idea-ejemplo:
+--	["m1", "m2", "m2"] 
+--		visitasPorMonumentos --> [("m1", 1),("m2", 2)]
+--			mapper->[(-1, "m1"), (-2, "m2")] 
+--				orderByKey --> [(-2, "m2"), (-1, "m1")] 
+--					reducecer -> ["m2", "m1"]
 monumentosTop :: [String] -> [String]
-monumentosTop = undefined
+monumentosTop = \l -> mapReduce mapper reducer ( visitasPorMonumento l ) 
+	where mapper = \(k, v) -> [(-v, k)]
+		reducer = \(k, l) -> l
+  
 
 -- Ejercicio 13 
+-- No probado (error en el s==Monument, trate con pattern matching, pero es medio bardero el GHCI
+-- Hay que usar pattern matchin, o definir la igualdad para Structure?
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
-monumentosPorPais = undefined
-
+monumentosPorPais =  \l -> mapReduce mapper reducer items
+	where mapper = \(s, dict) -> if s == Monument then [(dict!"country", 1)] else []
+		reducer = \(pais, l) -> [(pais, (length l)] 
 
 -- ------------------------ Ejemplo de datos del ejercicio 13 ----------------------
 data Structure = Street | City | Monument deriving Show
