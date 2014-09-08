@@ -82,7 +82,9 @@ mapReduce mapper reducer l =  reducerProcess reducer (combinerProcess (map (mapp
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
-visitasPorMonumento l = mapReduce (\s -> [(s,1)] ) (\(k,v) -> [( k, length(v) )]) l
+visitasPorMonumento l = mapReduce mapper reducer l
+	where mapper = \s -> [(s,1)]
+		  reducer = \(k,v) -> [( k, length(v) )]
 
 -- Otra opcion:
 visitasPorMonumento l = mapReduce mapper reducer l
@@ -108,15 +110,15 @@ monumentosTop = \l -> mapReduce mapper reducer ( visitasPorMonumento l )
   
 
 -- Ejercicio 13 
--- No probado (error en el s==Monument, trate con pattern matching, pero es medio bardero el GHCI
--- Hay que usar pattern matchin, o definir la igualdad para Structure?
-
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
--- monumentosPorPais =  \l -> mapReduce mapper reducer items
-	-- where mapper = \(s, dict) -> if s == Monument then [(dict!"country", 1)] else []
-		-- reducer = \(pais, l) -> [(pais, (length l)] 
+monumentosPorPais =  \l -> mapReduce mapper reducer l
+	where mapper (Monument, dict) = [(dict!"country", 1)]
+		  mapper (City, dict) = []
+		  mapper (Street, dict) = []
+		  mapper _ = error "fst(argumento) no es un Structure"
+		  reducer = \(pais, l) -> [(pais, (length l)] 
 
-monumentosPorPais l = mapReduce (\(s,dict) -> if (isMonument s) then [((dict ! "country"),1)] else [] ) ( \(pais,l) -> [(pais, (length l))] ) l
+--monumentosPorPais l = mapReduce (\(s,dict) -> if (isMonument s) then [((dict ! "country"),1)] else [] ) ( \(pais,l) -> [(pais, (length l))] ) l
 
 
 -- ------------------------ Ejemplo de datos del ejercicio 13 ----------------------
