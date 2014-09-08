@@ -82,14 +82,11 @@ mapReduce mapper reducer l =  reducerProcess reducer (combinerProcess (map (mapp
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
-visitasPorMonumento l = mapReduce mapper reducer l
-	where mapper = \s -> [(s,1)]
-		  reducer = \(k,v) -> [( k, length(v) )]
 
 -- Otra opcion:
-visitasPorMonumento l = mapReduce mapper reducer l
-	where mapper = \e -> [(e, 1)]
-	      reducer = \(k, l) -> [(k, (length l))]
+visitasPorMonumento = \lin -> mapReduce mapper reducer lin
+ where mapper = \e -> [(e, 1)]
+       reducer = \(k, l) -> [(k, (length l))]
 
 -- let visitasPorMonumento l = mapReduce (\e -> [(e, 1)]) (\(k, l) -> [(k, (lenght l))]) l
 
@@ -100,9 +97,8 @@ visitasPorMonumento l = mapReduce mapper reducer l
 --			mapper->[(-1, "m1"), (-2, "m2")] 
 --				orderByKey --> [(-2, "m2"), (-1, "m1")] 
 --					reducecer -> ["m2", "m1"]
-
 monumentosTop:: [String] -> [String]
-monumentosTop = \l -> mapReduce mapper reducer ( visitasPorMonumento l ) 
+monumentosTop = \ls -> mapReduce mapper reducer ( visitasPorMonumento ls ) 
 	where mapper = \(k, v) -> [(-v, k)]
 	      reducer = \(k, l) -> l
 
@@ -111,12 +107,12 @@ monumentosTop = \l -> mapReduce mapper reducer ( visitasPorMonumento l )
 
 -- Ejercicio 13 
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
-monumentosPorPais =  \l -> mapReduce mapper reducer l
+monumentosPorPais =  \lin -> mapReduce mapper reducer lin
 	where mapper (Monument, dict) = [(dict!"country", 1)]
-		  mapper (City, dict) = []
-		  mapper (Street, dict) = []
-		  mapper _ = error "fst(argumento) no es un Structure"
-		  reducer = \(pais, l) -> [(pais, (length l)] 
+	      mapper (City, dict) = []
+	      mapper (Street, dict) = []
+	      mapper _ = error "fst(argumento) no es un Structure"
+	      reducer = \(pais, l) -> [(pais, (length l))] 
 
 --monumentosPorPais l = mapReduce (\(s,dict) -> if (isMonument s) then [((dict ! "country"),1)] else [] ) ( \(pais,l) -> [(pais, (length l))] ) l
 
