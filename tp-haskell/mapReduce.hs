@@ -104,6 +104,7 @@ type Mapper a k v = a -> [(k,v)]
 type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
+-- distributionProcess
 -- Se define mediante foldl. foldl recibe una funcion encargada de tomar la cola de la recursion
 -- y concatenarla la cabeza a la que le agrega un elemento. foldl realiza la recursion sobre la lista
 -- de procesos y tiene como caso base una lista de listas con tantos elementos como procesadores a utilizar.
@@ -122,41 +123,85 @@ type Reducer k v b = (k, [v]) -> [b]
 
 distributionProcess :: Int -> [a] -> [[a]]
 distributionProcess n l = foldl (\rec e -> (tail rec) ++ [(head rec) ++ [e]] ) (replicate n []) l
+
 --Main> distributionProcess 2 ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10"]
 -- [["p1","p3","p5","p7","p9"],["p2","p4","p6","p8","p10"]]
+
 --Main> distributionProcess 3 ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10"]
 --  [["p2","p5","p8"],["p3","p6","p9"],["p1","p4","p7","p10"]]
 
+
 -- Ejercicio 7
+-- mapperProcess
+-- Se define mediante la aplicacion de la funcion de mapeo (Mapper) utilizando map sobre la lista
+-- de valores y concatenando los resultados (la lista de listas de tuplas clave valor). A su
+-- vez este resultado se agrupa por clave utilizando groupByKey.
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
 mapperProcess f l = groupByKey ( concat (map f l) )
 
--- Ejercicio 8
-combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
-combinerProcess ls = map (\(k, l) -> (k, concat l)) (sortByKey (groupByKey ( concat ls )))
+--Main> mapperProcess (\x -> [(show x, x)]) [1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5]
+-- [("1",[1,1,1]),("2",[2]),("3",[3,3]),("4",[4]),("5",[5,5,5,5,5,5,5,5])]
 
+
+-- Ejercicio 8
+-- combinerProcess
+-- Se define como la aplicacion de map sobre la concatenacion de la lista de listas, agrupadas 
+-- y ordenadas por clave. Al agrupar por clave, se generan tuplas (k, [[v]]). Finalmente el map
+-- se encarga de enviar cada tupla (k, [[v]]) a la correspondiente (k, [v]).
+combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
+combinerProcess ls = map (\(k, l) -> (k, concat l)) (sortByKey (groupByKey ( concat ls ))) 
+
+--Main> combinerProcess [[("1",[1,1,1]), ("2",[2,2])], [("3",[3,3,3,3,3,3])], [("1",[1,1,1])]]
+-- [("1",[1,1,1,1,1,1]),("2",[2,2]),("3",[3,3,3,3,3,3])]
+
+-- sortByKey
+-- Se define como el sortBy de la lista de tuplas (k, [v]) utilizando como funcion de comparacion
+-- una funcion que compara entre claves de tuplas.
 sortByKey::(Eq k, Ord k) => [(k, [v])] -> [(k,[v])]
 sortByKey = sortBy ( (\e1 e2 -> compare (fst e1) (fst e2) ) )
 
+
 -- Ejercicio 9
+-- reducerProcess
+-- Se define como la concatenacion del resultado de la funcion map que aplica la funcion "Reducer"
+-- a todos los elementos de la lista de tuplas (k, [v]).
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
 reducerProcess f l = concat ( map f l)
 
+-- -Main> reducerProcess (\(k, v) -> [(k, sum v) ]) [("1",[1,1,1,1,1,1]),("2",[2,2]),("3",[3,3,3,3,3,3])]
+-- [("1",6),("2",4),("3",18)]
+
+
 -- Ejercicio 10
+-- mapReduce
+-- Primero se mapea la funcion resultante de aplicar mapperProcess a la funcion mapper a la lista de listas obtenia
+-- al utilizar distributionProcess en 100 maquinas. Luego se combinan los resultados con combinerProcess y finalmente
+-- se aplica el reducer utilizando el reducerProcess.
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
 mapReduce mapper reducer l =  reducerProcess reducer (combinerProcess (map (mapperProcess mapper) (distributionProcess 100 l) ) )
 
--- Ejercicio 11
-visitasPorMonumento :: [String] -> Dict String Int
+-- Main> mapReduce   (\x -> [(show x, x)]) (\(k, v) -> [(k, length v) ]) [1, 1, 1, 2, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5]
+-- [("1",3),("2",1),("3",2),("4",1),("5",8)]
 
--- Otra opcion:
+
+-- Ejercicio 11
+-- visitasPorMonumento
+-- Se define aplicando mapReduce al mapper, reducer y la lista de monumentos. El mapper mapea cada elemento como
+-- una tupla con (nombre, cantidad) que luego se reducen agrupando la cantidad total por clave.
+visitasPorMonumento :: [String] -> Dict String Int
 visitasPorMonumento = \lin -> mapReduce mapper reducer lin
  where mapper = \e -> [(e, 1)]
        reducer = \(k, l) -> [(k, (length l))]
 
--- let visitasPorMonumento l = mapReduce (\e -> [(e, 1)]) (\(k, l) -> [(k, (lenght l))]) l
+-- Main> visitasPorMonumento ["m1", "m1", "m1", "m1", "m1", "m2", "m2", "m2", "m3", "m4"]
+-- [("m1",5),("m2",3),("m3",1),("m4",1)]
+
 
 -- Ejercicio 12
+-- monumentosTop
+-- Aprovecha que las claves se devuelven ordenadas crecientemente y el mapper utiliza el valor negativo
+-- de las visitas como clave para ordenarlas por mas visitados. 
+-- Luego las claves se descartan y se devuelven los valores.
 -- Idea-ejemplo:
 --	["m1", "m2", "m2"] 
 --		visitasPorMonumentos --> [("m1", 1),("m2", 2)]
@@ -168,10 +213,17 @@ monumentosTop = \ls -> mapReduce mapper reducer ( visitasPorMonumento ls )
 	where mapper = \(k, v) -> [(-v, k)]
 	      reducer = \(k, l) -> l
 
--- monumentosTop = \l -> mapReduce (\(k,v) -> [(-v,k)]) (\(k,l) ->l) (visitasPorMonumento l)
+-- Main>  monumentosTop ["m1", "m1", "m1", "m1", "m1", "m2", "m2", "m2", "m3", "m4"]
+-- ["m1","m2","m3","m4"]
+
   
 
 -- Ejercicio 13 
+-- monumentosPorPais
+-- Se define igual que los anteriores con la particularidad de que el mapper utiliza pattern matching.
+-- El mapper se encargara de mappear un 1 en el pais de cada uno de los monumentos mientras que
+-- ignorara las estructuras de tipo ciudad o calle. El reducer se encargara de combinar sumar
+-- todas las apariciones devolviendo el valor deseado.
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
 monumentosPorPais =  \lin -> mapReduce mapper reducer lin
 	where mapper (Monument, dict) = [(dict!"country", 1)]
@@ -180,7 +232,6 @@ monumentosPorPais =  \lin -> mapReduce mapper reducer lin
 	      mapper _ = error "fst(argumento) no es un Structure"
 	      reducer = \(pais, l) -> [(pais, (length l))] 
 
---monumentosPorPais l = mapReduce (\(s,dict) -> if (isMonument s) then [((dict ! "country"),1)] else [] ) ( \(pais,l) -> [(pais, (length l))] ) l
 
 
 -- ------------------------ Ejemplo de datos del ejercicio 13 ----------------------
