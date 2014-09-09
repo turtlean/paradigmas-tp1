@@ -63,7 +63,7 @@ main = hspec $ do
       reducerProcess (\(k,l) -> [(k, (length l))]) []  `shouldBe` ([]::Dict String Int) 
       reducerProcess (\(k,l) -> [(k, (length l))]) [("moluscos",[1,1,1]),("cetáceos",[1,1])]  `shouldBe` [("moluscos",3),("cetáceos",2)]
 
-	it "se obtiene la suma entre la clave y sumatoria de la lista correspondiente" $ do
+    it "se obtiene la suma entre la clave y sumatoria de la lista correspondiente" $ do
       reducerProcess (\(k,l) -> [k + (foldl (+) 0 l)]) [(1,[1]),(1,[2]),(2,[1]),(2,[2,3]),(4,[1]),(5,[1,2]),(6,[1]),(3,[1,2,3]),(3,[4]),(2,[4,5]),(3,[5])]  `shouldBe` [2,3,3,7,5,8,7,9,7,11,8]
       	
   describe "Utilizando Map Reduce" $ do
