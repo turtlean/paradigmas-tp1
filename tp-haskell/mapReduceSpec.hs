@@ -75,7 +75,7 @@ main = hspec $ do
       `shouldSatisfy` (\res -> res == ["m0", "m2", "m3", "m1"] || res == ["m0", "m2", "m1", "m3"])
 
     it "monumentos por pais" $ do
-      monumentosPorPais `shouldBe` [("Argentina", 3), ("Francia",1)("Irak",1)]
+      monumentosPorPais items `shouldBe` [("Argentina", 3), ("Francia",1)("Irak",1)]
 
     it "lista de monumentos" $ do
       mapReduce mapperListaMonus reducerListaMonus items `shouldBe` ["Obelisco","San Martn","Bagdad Bridge"]
