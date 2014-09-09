@@ -270,3 +270,11 @@ items = [
 
 ------------------------------------------------
 ------------------------------------------------
+-- Funciones para el Test "lista de monumentos"
+mapperListaMonus (Monument, dict) = [(1, dict!"name")]
+mapperListaMonus (Street, _) = []
+mapperListaMonus (City, _) = []
+reducerListaMonus = \(k, l) -> l
+
+mapperCuentaLetras = \s -> foldr (\e rec -> (e,[1]) : rec) [] s
+reducerCuentaLetras = \(k, l) -> [(k, (length l))]

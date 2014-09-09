@@ -63,6 +63,9 @@ main = hspec $ do
       reducerProcess (\(k,l) -> [(k, (length l))]) []  `shouldBe` ([]::Dict String Int) 
       reducerProcess (\(k,l) -> [(k, (length l))]) [("moluscos",[1,1,1]),("cetáceos",[1,1])]  `shouldBe` [("moluscos",3),("cetáceos",2)]
 
+    it "se obtiene la suma entre la clave y sumatoria de la lista correspondiente" $ do
+      reducerProcess (\(k,l) -> [k + (foldl (+) 0 l)]) [(1,[1]),(1,[2]),(2,[1]),(2,[2,3]),(4,[1]),(5,[1,2]),(6,[1]),(3,[1,2,3]),(3,[4]),(2,[4,5]),(3,[5])]  `shouldBe` [2,3,3,7,5,8,7,9,7,11,8]
+      	
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
@@ -70,3 +73,12 @@ main = hspec $ do
     it "monumentosTop devuelve los más visitados en algún orden" $ do 
       monumentosTop [ "m1", "m0", "m0", "m0", "m2", "m2", "m3"] 
       `shouldSatisfy` (\res -> res == ["m0", "m2", "m3", "m1"] || res == ["m0", "m2", "m1", "m3"])
+
+    it "monumentos por pais" $ do
+      monumentosPorPais items `shouldBe` [("Argentina", 2),("Irak",1)]
+
+    it "lista de monumentos" $ do
+      mapReduce mapperListaMonus reducerListaMonus items `shouldSatisfy` (\res -> res == ["Obelisco","San Martn","Bagdad Bridge"] || res == ["Obelisco","San Martín","Bagdad Bridge"] )
+
+    it "se obtiene una lista de tuplas (caracter, cantidad de apariciones)" $ do
+      mapReduce mapperCuentaLetras reducerCuentaLetras ["este es un texto de prueba"] `shouldBe` [(' ',5),('a',1),('b',1),('d',1),('e',6),('n',1),('o',1),('p',1),('r',1),('s',2),('t',3),('u',2),('x',1)]
