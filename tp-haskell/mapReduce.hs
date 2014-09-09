@@ -108,6 +108,18 @@ type Reducer k v b = (k, [v]) -> [b]
 -- y concatenarla la cabeza a la que le agrega un elemento. foldl realiza la recursion sobre la lista
 -- de procesos y tiene como caso base una lista de listas con tantos elementos como procesadores a utilizar.
 -- De esta manera recorre cada elemento rotando las listas a las cuales debe agregarlos.
+-- La idea subyacente es la siguiente: La funcion combinadora se encarga de mantener el resultado recursivo
+-- ordenado de manera creciente en cantidad de elementos (en la primera posicion se ubicara siempre
+-- el elemento con menor cantidad de elementos). De esta manera, luego de insertar un elemento en la
+-- lista que ocupa la primera posicion, la misma debe ser enviada al final para que los nuevos elementos
+-- sean insertados en las listas siguientes.
+-- Ejemplo con distribucion de elementos en 3 listas:
+-- Inicio: [1,2,3,4] [ [], [], [] ]
+-- Paso 1: [2,3,4] [ [], [], [1] ]
+-- Paso 2: [3,4] [ [], [1], [2] ]
+-- Paso 3: [4] [ [1], [2], [3] ]
+-- Paso 4: [ [2], [3], [1,4] ]
+
 distributionProcess :: Int -> [a] -> [[a]]
 distributionProcess n l = foldl (\rec e -> (tail rec) ++ [(head rec) ++ [e]] ) (replicate n []) l
 --Main> distributionProcess 2 ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10"]
