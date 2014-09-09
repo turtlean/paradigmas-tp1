@@ -74,11 +74,11 @@ main = hspec $ do
       monumentosTop [ "m1", "m0", "m0", "m0", "m2", "m2", "m3"] 
       `shouldSatisfy` (\res -> res == ["m0", "m2", "m3", "m1"] || res == ["m0", "m2", "m1", "m3"])
 
-	it "monumentos por pais" $ do
+    it "monumentos por pais" $ do
       monumentosPorPais `shouldBe` [("Argentina", 3), ("Francia",1)("Irak",1)]
 
-	it "lista de monumentos" $ do
+    it "lista de monumentos" $ do
       mapReduce mapperListaMonus reducerListaMonus items `shouldBe` ["Obelisco","San Martn","Bagdad Bridge"]
-	  
-	it "se obtiene una lista de tuplas (caracter, cantidad de apariciones)" $ do
-	  mapReduce mapperCuentaLetras reducerCuentaLetras ["este es un texto de prueba"] `shouldBe` [(' ',5),('a',1),('b',1),('d',1),('e',6),('n',1),('o',1),('p',1),('r',1),('s',2),('t',3),('u',2),('x',1)]
+
+    it "se obtiene una lista de tuplas (caracter, cantidad de apariciones)" $ do
+      mapReduce mapperCuentaLetras reducerCuentaLetras ["este es un texto de prueba"] `shouldBe` [(' ',5),('a',1),('b',1),('d',1),('e',6),('n',1),('o',1),('p',1),('r',1),('s',2),('t',3),('u',2),('x',1)]
