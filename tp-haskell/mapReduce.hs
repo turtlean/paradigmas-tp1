@@ -199,7 +199,7 @@ visitasPorMonumento = \lin -> mapReduce mapper reducer lin
 
 -- Ejercicio 12
 -- monumentosTop
--- Aprovecha que las claves se devuelven ordenadas crecientemente y el mapper utiliza el valor negativo
+-- Aprovecha que las claves se devuelven ordenadas de forma creciente y el mapper utiliza el valor negativo
 -- de las visitas como clave para ordenarlas por mas visitados. 
 -- Luego las claves se descartan y se devuelven los valores.
 -- Idea-ejemplo:
